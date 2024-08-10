@@ -1,3 +1,6 @@
+const createPattern = url => new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+
+const resourcesURL = `${new URLSearchParams(window.location.search).get('resources') || 'https://s.eu.tankionline.com'}`;
 
 const overrideCustom = ({from, to, comment = "---"}) => {
     resourcesOverrider.push({
