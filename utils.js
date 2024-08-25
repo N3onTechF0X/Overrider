@@ -1,3 +1,7 @@
+const createPattern = url => new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+
+const resourcesURL = `${new URLSearchParams(window.location.search).get('resources') || 'https://s.eu.tankionline.com'}`;
+
 const overrideCustom = ({from, to, comment = "---"}) => {
     resourcesOverrider.push({
         from: from,
@@ -31,6 +35,7 @@ const overrideCustomPaint = ({from, image, frame = null, comment = "---"}) => {
 };
 
 // FIXME: Устаревшие ссылки, обновить
+/*
 const overrideSky = (type, {top, bottom, left, right, back, front}) => {
     if (type == "space") {
         resourcesOverrider.push({
@@ -60,3 +65,4 @@ const overrideSky = (type, {top, bottom, left, right, back, front}) => {
         }, );
     }
 };
+*/
