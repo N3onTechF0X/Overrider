@@ -6,7 +6,7 @@ const overrideCustom = ({from, to, comment = "---"}) => {
     })
 }
 
-const overrideSkin = ({from, to, comment = "---"}, files = ['object.a3d', 'lightmap.webp', 'tracks.webp', 'wheels.webp', 'meta.info']) => {
+const overrideSkin = ({from, to, comment = "---"}, files = ['object.a3d', 'lightmap.webp', 'tracks.webp', 'wheels.webp', 'meta.info', 'object.3ds'/*Для подмены дронов*/]) => {
     const paths = files.map(file => ({
         from: `${from}/${file}`,
         to: `${resourcesURL}/${to}/${file}`,
