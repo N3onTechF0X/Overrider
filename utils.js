@@ -6,13 +6,27 @@ const overrideCustom = ({from, to, comment = "---"}) => {
     })
 }
 
-const overrideSkin = ({from, to, comment = "---"}, files = ['object.a3d', 'lightmap.webp', 'tracks.webp', 'wheels.webp', 'meta.info', 'object.3ds'/*Для подмены дронов*/]) => {
-    const paths = files.map(file => ({
-        from: `${from}/${file}`,
-        to: `${resourcesURL}/${to}/${file}`,
-        comment: comment + ` | ${file}`
-    }));
-    resourcesOverrider.push(...paths);
+const overrideSkin = ({element, from="standart", to="standart"}) => {
+	if (!element) {
+		console.error("[Overrider] element не указан.");
+		return;
+	} else if (!textures[element]) {
+		console.error(`[Overrider] ${element} не найден.`);
+		return;
+	} else if (!textures[element][to]) {
+		console.error(`[Overrider] ${to} на ${element} не найден.`);
+		return;
+	} else if (!textures[element][from]) {
+		console.error(`[Overrider] ${from} на ${element} не найден.`);
+		return;
+	} else {
+		const paths = ['object.a3d', 'lightmap.webp', 'tracks.webp', 'wheels.webp', 'meta.info', 'object.3ds'].map(file => ({
+			from: `${resourcesURL}/${textures[element][from]}/${file}`,
+			to: `${resourcesURL}/${textures[element][to]}/${file}`,
+			comment: `${element} ${from} -> ${to} | ${file}`
+		}));
+		resourcesOverrider.push(...paths);
+	}
 };
 
 const overrideCustomPaint = ({from, image, frame = null, comment = "---"}) => {
