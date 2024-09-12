@@ -3,11 +3,11 @@
 // @version      3.0.0
 // @description  Override any file in game
 // @author       N3onTechF0X
-// @icon         https://raw.githubusercontent.com/N3onTechF0X/overrider-API_like/main/logo.png
+// @icon         https://raw.githubusercontent.com/N3onTechF0X/Overrider/main/logo.png
 // @match        https://*.tankionline.com/*
-// @require      file:///C:/Users/user/Documents/TO/textures.js
-// @require      https://raw.githubusercontent.com/N3onTechF0X/overrider-API_like/main/overrider.src.js
-// @require      https://raw.githubusercontent.com/N3onTechF0X/overrider-API_like/main/utils.js
+// @require      https://raw.githubusercontent.com/N3onTechF0X/Overrider/main/textures.js
+// @require      https://raw.githubusercontent.com/N3onTechF0X/Overrider/main/overrider.src.js
+// @require      https://raw.githubusercontent.com/N3onTechF0X/Overrider/main/utils.js
 // @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
 // @run-at       document-start
