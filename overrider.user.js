@@ -9,8 +9,6 @@
 // @require      https://raw.githubusercontent.com/N3onTechF0X/Overrider/main/overrider.src.js
 // @require      https://raw.githubusercontent.com/N3onTechF0X/Overrider/main/utils.js
 // @grant        GM_xmlhttpRequest
-// @grant        unsafeWindow
-// @run-at       document-start
 // ==/UserScript==
 
 // Примеры
