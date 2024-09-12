@@ -147,5 +147,5 @@ VK - [n3ontechf0x](https://vk.com/n3ontechf0x)
 - squirtatrise - скины в базу
 - humorist - скины в базу
 - mtz__82 - скины в базу
-- iamnoob - скины в базу  
+- gps.locator - скины в базу  
 
