@@ -6,7 +6,7 @@ const overrideCustom = ({from, to, comment = "---"}) => {
     })
 }
 
-const overrideSkin = ({element, from="standart", to="standart"}) => {
+const overrideSkin = ({element, from="default", to="default"}) => {
 	if (!element) {
 		console.error("[Overrider] element не указан.");
 		return;
