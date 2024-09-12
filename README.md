@@ -127,7 +127,7 @@ overrideSkin({ // Замена хантера прайм на ультра
 
 ## Обратная связь
 
-Discord - [neontechfox](https://discordapp.com/users/1086946472576159794)
+Discord - [neontechfox](https://discordapp.com/users/1086946472576159794)  
 VK - [n3ontechf0x](https://vk.com/n3ontechf0x)
 
 ## Благодарности
