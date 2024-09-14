@@ -8,7 +8,7 @@ Overrider - это скрипт, который может подменять т
 
 ## Установка
 1. TamperMonkey - [click](https://www.tampermonkey.net)
-2. Overrider - [click](https://github.com/N3onTechF0X/Overrider/raw/main/Overrider.user.js)
+2. Overrider - [click](https://github.com/N3onTechF0X/Overrider/raw/main/overrider.user.js)
 
 ## Использование
 
