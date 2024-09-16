@@ -1,5 +1,13 @@
 const createPattern = url => new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-const resourcesURL = 'https://s.eu.tankionline.com';
+const resourcesParam = new URLSearchParams(window.location.search).get('resources');
+const resourcesURL = resourcesParam ?
+    new URL(resourcesParam, window.location.origin).href :
+    window.location.hostname === '3dtank.com' ?
+    'https://res.3dtank.com' :
+    window.location.hostname === 'tankionline.com' ?
+    'https://s.eu.tankionline.com' :
+    undefined;
+if (!resourcesURL) console.error("[Overrider] Cant find resource server");
 const resourcesOverrider = [];
 const originalFetch = unsafeWindow.fetch;
 unsafeWindow.fetch = async (url, options) => {
