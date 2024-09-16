@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Overrider
-// @version      3.0.0
+// @version      3.0.1
 // @description  Override any file in game
 // @author       N3onTechF0X
 // @icon         https://raw.githubusercontent.com/N3onTechF0X/Overrider/main/logo.png
