@@ -21,7 +21,7 @@ const overrideSkin = ({element, from="default", to="default"}) => {
 		return;
 	} else {
 		const paths = ['object.a3d', 'lightmap.webp', 'tracks.webp', 'wheels.webp', 'meta.info', 'object.3ds'].map(file => ({
-			from: `${resourcesURL}/${textures[element][from]}/${file}`,
+			from: `${textures[element][from]}/${file}`,
 			to: `${resourcesURL}/${textures[element][to]}/${file}`,
 			comment: `${element} ${from} -> ${to} | ${file}`
 		}));
