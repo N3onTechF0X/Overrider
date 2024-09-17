@@ -7,7 +7,10 @@ const resourcesURL = resourcesParam ?
     window.location.hostname === 'tankionline.com' ?
     'https://s.eu.tankionline.com' :
     undefined;
-if (!resourcesURL) console.error("[Overrider] Cant find resource server");
+if (!resourcesURL) {
+	console.error("[Overrider] Cant find resource server");
+	return;
+}
 const resourcesOverrider = [];
 const originalFetch = unsafeWindow.fetch;
 unsafeWindow.fetch = async (url, options) => {
