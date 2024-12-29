@@ -5,7 +5,7 @@
 // @author       N3onTechF0X
 // @icon         https://raw.githubusercontent.com/N3onTechF0X/Overrider/main/logo.png
 // @match        https://*.tankionline.com/*
-// @require      https://raw.githubusercontent.com/N3onTechF0X/Overrider/main/textures.js
+// @require      https://raw.githubusercontent.com/N3onTechF0X/Overrider/main/consts.js
 // @require      https://raw.githubusercontent.com/N3onTechF0X/Overrider/main/overrider.src.js
 // @require      https://raw.githubusercontent.com/N3onTechF0X/Overrider/main/utils.js
 // @grant        GM_xmlhttpRequest
