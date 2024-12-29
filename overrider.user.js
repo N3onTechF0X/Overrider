@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Overrider
-// @version      3.0.1
+// @version      3.1.1
 // @description  Override any file in game
 // @author       N3onTechF0X
 // @icon         https://raw.githubusercontent.com/N3onTechF0X/Overrider/main/logo.png
@@ -12,12 +12,5 @@
 // ==/UserScript==
 
 // Примеры
-overrideSkin({ // Замена стандартного скина смоки на ХТ
-  element: "smoky",
-  to: "XT" // параметр from можно не писать если вы заменяете стандартый скин
-})
-overrideSkin({ // Замена хантера прайм на ультра
-  element: "hunter",
-  from: "PR",
-  to: "UT"
-})
+setSkin("smoky", "XT"); // Замена смоки на хт
+setSkin("hunter", "GT"); // Замена хантера на гт
