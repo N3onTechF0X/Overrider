@@ -35,4 +35,4 @@ const defaultTextures = {
     hyperion: "556/107004/326/35/31167700276045"
 };
 const baseToUrl = "https://raw.githubusercontent.com/N3onTechF0X/TankiTextures/refs/heads/main/{folder}/{element}/{skin}/{file}"
-const filenames = ["lightmap.webp", "image.webp", "texture.webp", "tracks.webp", "wheels.webp", "object.a3d", "object.3ds", "meta.info"]
+const filenames = ["lightmap.webp", "image.webp", "texture.webp", "tracks.webp", "wheels.webp", "object.a3d", "object.3ds"]
