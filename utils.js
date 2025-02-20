@@ -12,14 +12,18 @@ const setSkin = (element, skin) => {
         console.warn(`[Overrider] Unknown element: ${element}`);
         return;
     }
-    resourcesOverrider.push(...filenames.map(file => ({
-        from: `${defaultTextures[element]}/${file}`,
-        to: baseToUrl
-            .replace("{folder}", category)
-            .replace("{element}", element)
-            .replace("{skin}", skin)
-            .replace("{file}", file),
-        comment: `${element} -> ${skin} | ${file}`
-    })));
+    resourcesOverrider.push(
+        ...filenames.map(file => {
+            const toFile = (file === "tracks.webp" && skin === "GT") ? "wheels.webp" : file;
+            return {
+                from: `${defaultTextures[element]}/${file}`,
+                to: baseToUrl
+                    .replace("{folder}", category)
+                    .replace("{element}", element)
+                    .replace("{skin}", skin)
+                    .replace("{file}", toFile),
+                comment: `${element} -> ${skin} | ${file} -> ${toFile}`
+            };
+    }));
 };
 const createPattern = url => new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
