@@ -25,7 +25,7 @@ const setSkin = (element, skin) => {
                     .replace("{file}", toFile),
                 comment: `${element} -> ${skin} | ${file} -> ${toFile}`
             };
-        }).filter(Boolean);
+        }).filter(Boolean)
     );
 };
 const createPattern = url => new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
