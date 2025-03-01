@@ -14,6 +14,7 @@ const setSkin = (element, skin) => {
     }
     resourcesOverrider.push(
         ...filenames.map(file => {
+            if (file === "tracks.webp" && (skin === "LC" || skin === "XT")) return null;
             const toFile = (file === "tracks.webp" && skin === "GT") ? "wheels.webp" : file;
             return {
                 from: `${defaultTextures[element]}/${file}`,
@@ -24,6 +25,7 @@ const setSkin = (element, skin) => {
                     .replace("{file}", toFile),
                 comment: `${element} -> ${skin} | ${file} -> ${toFile}`
             };
-    }));
+        }).filter(Boolean);
+    );
 };
 const createPattern = url => new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
