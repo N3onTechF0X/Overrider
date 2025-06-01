@@ -4,7 +4,6 @@ const categories = new Map([
     ["drones", ["crisis", "hyperion"]]
 ]);
 const defaultTextures = {
-{
     "wasp": "574/111243/33/322/31167700276263",
     "hopper": "564/5207/367/304/31244271140755",
     "hornet": "566/70102/323/346/31167700274103",
