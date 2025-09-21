@@ -8,7 +8,7 @@
  *  - `GM_xmlhttpRequest`
  *
  * Подключение:
- * // @require  https://.../overrider.src.js
+ * // @require  https://raw.githubusercontent.com/N3onTechF0X/Overrider/refs/heads/main/overrider.src.js
  *
  * Использование:
  * const overrider = new ResourceOverrider();
