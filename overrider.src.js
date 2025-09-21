@@ -302,5 +302,3 @@ class ResourceOverrider {
      */
     clearRules() { this.rules = [] }
 }
-
-const _overrider = new ResourceOverrider();
