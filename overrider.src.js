@@ -165,7 +165,7 @@ class ResourceOverrider {
     _hookFetch() {
         unsafeWindow.fetch = async (url, options) => {
             const rule = this.rules
-                .filter(r => r.matches(url))
+                .filter(r => r.matches(typeof url === "string" ? url : url.url))
                 .sort((a, b) => b.priority - a.priority)[0];
 
             if (!rule) return await this.originalFetch.call(unsafeWindow, url, options);
