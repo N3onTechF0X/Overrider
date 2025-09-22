@@ -101,7 +101,7 @@ class ResourceOverrider {
      * @param {"info"|"debug"|"warn"|"error"|null} [data.logLevel="info"] - Уровень логирования.
      * @throws {Error} Если unsafeWindow или GM_xmlhttpRequest недоступны.
      */
-    constructor({ fallback=true, logLevel="info" }) {
+    constructor({ fallback=true, logLevel="info" } = {}) {
         if (typeof unsafeWindow === "undefined") {
             console.error(
                 `[Overrider] `,
