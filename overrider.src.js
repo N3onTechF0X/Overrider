@@ -187,9 +187,9 @@ class ResourceOverrider {
                         responseType: "blob",
                         onload: (res) => res.status === 200 ? resolve(res) : reject(res),
                         onerror: reject,
-                        method: options.method || "GET",
-                        headers: options.headers || {},
-                        data: options.body ?? null,
+                        method: options?.method || "GET",
+                        headers: options?.headers || {},
+                        data: options?.body ?? null,
                         ...rule.options
                     });
                 });
