@@ -1,25 +1,32 @@
 /**
- * @fileoverview
+ * @file
  * Библиотека для Tampermonkey/Greasemonkey, позволяющая подменять или блокировать
  * загрузку игровых файлов через перехват `fetch`.
  *
- * ВНИМАНИЕ: Для работы библиотеки необходим доступ к функциям Tampermonkey/Greasemonkey:
- *  - `unsafeWindow`
- *  - `GM_xmlhttpRequest`
+ * @note Для работы необходимы права доступа к `unsafeWindow` и `GM_xmlhttpRequest`.
  *
- * Подключение:
- * // @require  https://raw.githubusercontent.com/N3onTechF0X/Overrider/refs/heads/main/overrider.src.js
+ * @example
+ * // Подключение через Tampermonkey/Greasemonkey:
+ * // @require https://raw.githubusercontent.com/N3onTechF0X/Overrider/refs/heads/main/overrider.src.js
  *
- * Использование:
  * const overrider = new ResourceOverrider();
- * overrider.addRule({ from: "original_url", to: "new_url", comment: "..." });
+ * overrider.addRule({ from: "original_url", to: "new_url" });
+ *
+ * @author N3onTechF0X
+ * @version 4.0.1
+ * @license MIT
+ * @since 2024-09-12
+ * @updated 2025-09-22
  */
 
 /**
  * Класс описывает правило подмены или блокировки ресурса.
+ * @class
  */
 class OverrideRule {
     /**
+     * Создаёт новое правило подмены или блокировки ресурса.
+     * @constructor
      * @param {Object} config - Конфигурация правила
      * @param {string|RegExp|function(string):boolean} config.from - Шаблон для совпадения URL.
      *        Можно использовать строку, регулярное выражение или функцию.
@@ -28,23 +35,31 @@ class OverrideRule {
      *        - `{origin}`    → `location.origin`
      *        - `{host}`      → `location.host`
      *        - `{pathname}`  → `location.pathname`
-     *        - `{timestamp}` → `Date.now()`
+     *        - `{query}`     → `location.search`
+     *        - `{timestamp}` → `Date.now().toString()`
      *        - `{random}`    → `Math.random().toString(36).slice(2)`
      *
      * @param {string} [config.comment="---"] - Комментарий для правила.
      * @param {boolean} [config.enabled=true] - Включено ли правило.
      * @param {number} [config.priority=0] - Приоритет правила (чем выше, тем важнее).
+     * @param {Object} [config.options={}] - Параметры запроса.
      */
-    constructor({ from, to, comment = "---", enabled = true, priority = 0 }) {
+    constructor({ from, to, comment = "---", enabled = true, priority = 0, options={} }) {
         this.from = from;
         this.to = to;
         this.comment = comment;
         this.enabled = enabled;
         this.priority = priority;
+        this.options = options;
 
-        if (from instanceof RegExp) { this.pattern = from }
-        else if (typeof from === "function") { this.pattern = from }
-        else { this.pattern = new RegExp(from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) }
+        if (from instanceof RegExp) {
+            this.matcher = url => from.test(url);
+        } else if (typeof from === "function") {
+            this.matcher = url => !!from(url);
+        } else {
+            const regex = new RegExp(from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+            this.matcher = url => regex.test(url);
+        }
     }
 
     /**
@@ -53,16 +68,11 @@ class OverrideRule {
      * @returns {boolean} true, если совпадает.
      */
     matches(url) {
-        if (!this.enabled) return false;
-        if (this.pattern instanceof RegExp) return this.pattern.test(url);
-        if (typeof this.pattern === "function") return !!this.pattern(url);
-        return false;
+        return this.enabled && this.matcher(url);
     }
 
     /**
      * Возвращает итоговый URL для подмены с подстановкой динамических значений.
-     * Подставляет плейсхолдеры `{origin}`, `{host}`, `{pathname}`, `{timestamp}`, `{random}`.
-     *
      * @returns {string|null} Итоговый URL с подстановками, либо `null`, если `to` не задано.
      */
     getProcessedTo() {
@@ -71,6 +81,7 @@ class OverrideRule {
             .replace(/\{origin}/g, location.origin)
             .replace(/\{host}/g, location.host)
             .replace(/\{pathname}/g, location.pathname)
+            .replace(/\{query}/g, location.search)
             .replace(/\{timestamp}/g, Date.now().toString())
             .replace(/\{random}/g, Math.random().toString(36).slice(2));
     }
@@ -79,38 +90,35 @@ class OverrideRule {
 /**
  * Основной класс для управления подменой ресурсов.
  * Перехватывает глобальный `fetch` и применяет правила.
+ * @class
  */
 class ResourceOverrider {
     /**
      * Создаёт экземпляр ResourceOverrider.
-     *
-     * @param {Object} [options] - Опции инициализации.
-     * @param {boolean} [options.fallback=true] - Использовать оригинальный fetch при ошибке подмены.
-     * @param {"info"|"debug"|"warn"|"error"|null} [options.logLevel="info"] - Уровень логирования.
+     * @constructor
+     * @param {Object} [data] - Опции инициализации.
+     * @param {boolean} [data.fallback=true] - Использовать оригинальный fetch при ошибке подмены.
+     * @param {"info"|"debug"|"warn"|"error"|null} [data.logLevel="info"] - Уровень логирования.
+     * @throws {Error} Если unsafeWindow или GM_xmlhttpRequest недоступны.
      */
-    constructor(options = {}) {
-        const styles = {
-            header: "color: #8e44ad; font-weight: bold;",
-            error: "color: #ff4444; font-weight: bold;",
-            text: "color: #ffffff;"
-        };
+    constructor({ fallback=true, logLevel="info" }) {
         if (typeof unsafeWindow === "undefined") {
             console.error(
-                "%c[Overrider] %cОшибка: %cunsafeWindow недоступен",
-                styles.header, styles.text, styles.error
+                `[Overrider] `,
+                `Ошибка: unsafeWindow недоступен`
             );
             throw new Error("unsafeWindow undefined");
         }
         if (typeof GM_xmlhttpRequest === "undefined") {
             console.error(
-                "%c[Overrider] %cОшибка: %cGM_xmlhttpRequest недоступен",
-                styles.header, styles.text, styles.error
+                `[Overrider] `,
+                `Ошибка: GM_xmlhttpRequest недоступен`
             );
             throw new Error("GM_xmlhttpRequest undefined");
         }
 
-        this.fallback = options.fallback ?? true;
-        this.logLevel = options.logLevel ?? "info";
+        this.fallback = fallback;
+        this.logLevel = logLevel;
         /** @type {OverrideRule[]} */
         this.rules = [];
 
@@ -127,8 +135,6 @@ class ResourceOverrider {
          * - success : ресурс успешно подменён
          * - blocked : ресурс заблокирован
          * - error   : ошибка подмены
-         * @example
-         * overrider.on.success((data) => console.log("Подмена:", data));
          */
         this.on = {
             start: (fn) => { this._eventHandlers.start = fn },
@@ -142,8 +148,19 @@ class ResourceOverrider {
     }
 
     /**
-     * Подменяет глобальный `fetch`, добавляя проверку правил.
+     * @returns {Object} Объект с текущим состоянием.
+     */
+    toObject() { return { ...this } }
+
+    /**
+     * @returns {string} JSON-представление объекта.
+     */
+    toString() { return JSON.stringify(this) }
+
+    /**
+     * Подменяет глобальный fetch, добавляя проверку правил.
      * @private
+     * @returns {void}
      */
     _hookFetch() {
         unsafeWindow.fetch = async (url, options) => {
@@ -153,35 +170,39 @@ class ResourceOverrider {
 
             if (!rule) return await this.originalFetch.call(unsafeWindow, url, options);
 
-            this._emit("match", { rule, url });
+            this._emit("match", { rule, url, options });
 
             if (rule.to === null) {
                 const response = new Response("", { status: 200, statusText: "OK" });
-                this._emit("blocked", { rule });
+                this._emit("blocked", { rule, url, options });
                 return response;
             }
 
             try {
                 const urlToFetch = rule.getProcessedTo();
+
                 const response = await new Promise((resolve, reject) => {
                     GM_xmlhttpRequest({
-                        method: "GET",
                         url: urlToFetch,
                         responseType: "blob",
                         onload: (res) => res.status === 200 ? resolve(res) : reject(res),
-                        onerror: reject
+                        onerror: reject,
+                        method: options.method || "GET",
+                        headers: options.headers || {},
+                        data: options.body ?? null,
+                        ...rule.options
                     });
                 });
 
-                this._emit("success", { rule });
+                this._emit("success", { rule, url, options, response });
 
                 return new Response(response.response, {
-                    status: 200,
-                    statusText: "OK",
+                    status: response.status,
+                    statusText: response.statusText,
                     headers: { "Content-Type": response.response.type }
                 });
             } catch (error) {
-                this._emit("error", { rule, error });
+                this._emit("error", { rule, url, options, error });
                 return this.fallback
                     ? await this.originalFetch.call(unsafeWindow, url, options)
                     : new Response("", { status: 502, statusText: "Bad Gateway" });
@@ -192,9 +213,10 @@ class ResourceOverrider {
 
     /**
      * Генерация события.
+     * @private
      * @param {"start"|"match"|"success"|"blocked"|"error"} event - Тип события.
      * @param {Object} payload - Данные события.
-     * @private
+     * @returns {void}
      */
     _emit(event, payload) {
         const handler = this._eventHandlers[event];
@@ -202,9 +224,8 @@ class ResourceOverrider {
             try { handler(payload) }
             catch (e) {
                 console.error(
-                    "%c[Overrider] %cEvent handler error:",
-                    "color: #8e44ad; font-weight: bold;", "color: #ff4444; font-weight: bold;",
-                    e
+                    `[Overrider] `,
+                    `Event handler error: `, e
                 );
             }
         } else this._log(event, payload);
@@ -212,9 +233,10 @@ class ResourceOverrider {
 
     /**
      * Логирование событий в консоль, если нет обработчиков.
+     * @private
      * @param {string} event - Тип события.
      * @param {Object} payload - Данные события.
-     * @private
+     * @returns {void}
      */
     _log(event, payload = {}) {
         if (!this.logLevel) return;
@@ -226,51 +248,43 @@ class ResourceOverrider {
         };
         event = ["start", "match", "success", "blocked", "error"].includes(event) ? event : "unknown";
 
-        if (!(allowedEvents[this.logLevel]?.includes(event))) return;
+        if (!(allowedEvents[this.logLevel]?.includes(event)))
+            return;
 
-        const styles = {
-            header: "color: #8e44ad; font-weight: bold;",
-            text: "color: #ffffff;",
-            comment: "color: #aaaaaa;",
-            error: "color: #ff4444; font-weight: bold;",
-            link: "color: #aaaaff; text-decoration: underline;",
-        };
-
-        const prefix = "%c[Overrider]";
         const loggers = {
             start: () => console.info(
-                `${prefix} %cstart`,
-                styles.header, styles.text
+                `[Overrider] `,
+                `start`
             ),
             success: () => console.info(
-                `${prefix} %cResource overridden.\nFrom: %c%s\n%cTo: %c%s\n%cComment: %c%s`,
-                styles.header, styles.text,
-                styles.link, payload.rule?.from,
-                styles.text, styles.link, payload.rule?.to,
-                styles.text, styles.comment, payload.rule?.comment
+                `[Overrider] `,
+                `Resource overridden.\n`,
+                `From: ${payload.rule?.from}\n`,
+                `To: ${payload.rule?.to}\n`,
+                `Comment:  ${payload.rule?.comment}`
             ),
             blocked: () => console.info(
-                `${prefix} %cResource blocked.\nLink: %c%s\n%cComment: %c%s`,
-                styles.header, styles.text,
-                styles.link, payload.rule?.from,
-                styles.text, styles.comment, payload.rule?.comment
+                `[Overrider] `,
+                `Resource blocked.\n`,
+                `Link: ${payload.rule?.from}\n`,
+                `Comment: ${payload.rule?.comment}`
             ),
             error: () => console.error(
-                `${prefix} %cFailed to load resource.\nLink: %c%s\n%cComment: %c%s\n%cError: %c%s`,
-                styles.header, styles.text,
-                styles.link, payload.rule?.to,
-                styles.text, styles.comment, payload.rule?.comment,
-                styles.text, styles.error, payload.error?.status || payload.error
+                `[Overrider] `,
+                `Failed to load resource.\n`,
+                `Link: ${payload.rule?.to}\n`,
+                `Comment: ${payload.rule?.comment}\n`,
+                `Error: ${payload.error?.status || payload.error}`
             ),
             match: () => console.debug(
-                `${prefix} %cMatched rule: %s | %c%s\n%cLink: %c%s`,
-                styles.header, styles.text, payload.rule?.from,
-                styles.comment, payload.rule?.comment,
-                styles.text, styles.link, payload.url
+                `[Overrider] `,
+                `Matched rule: ${payload.rule?.from}\n`,
+                `Link: ${payload.url}\n`,
+                `Comment: ${payload.rule?.comment}`
             ),
             unknown: () => console.warn(
-                `${prefix} %cUnknown event: %s`,
-                styles.header, styles.text, event, payload
+                `[Overrider] `,
+                `Unknown event: ${event}`, payload
             )
         };
         loggers[event]();
@@ -279,6 +293,7 @@ class ResourceOverrider {
     /**
      * Добавляет одно или несколько правил подмены.
      * @param {...Object} rulesConfigs - Конфигурации правил.
+     * @returns {void}
      */
     addRule(...rulesConfigs) {
         rulesConfigs.forEach(cfg => {
@@ -291,6 +306,7 @@ class ResourceOverrider {
     /**
      * Удаляет правило по объекту или индексу.
      * @param {OverrideRule|number} ruleOrIndex - Ссылка на правило или его индекс.
+     * @returns {void}
      */
     removeRule(ruleOrIndex) {
         if (typeof ruleOrIndex === "number") this.rules.splice(ruleOrIndex, 1);
@@ -299,6 +315,7 @@ class ResourceOverrider {
 
     /**
      * Удаляет все правила.
+     * @returns {void}
      */
     clearRules() { this.rules = [] }
 }
